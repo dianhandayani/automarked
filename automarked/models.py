@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_login import UserMixin
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, DataRequired, Email, Length, EqualTo
+from wtforms.validators import InputRequired, DataRequired, Email, Length, EqualTo, Regexp
 from automarked import db
 
 class User(UserMixin, db.Model):
@@ -34,6 +34,7 @@ class LoginForm(FlaskForm):
     username = StringField(
         'Username',
         validators=[InputRequired(),
+        Regexp(r'^[A-Za-z0-9]+(?:[._][A-Za-z0-9]+)*$', message='Fuck! Username must contain only letters numbers or underscore'),
         Length(min=4, max=32)
         ])
     password = PasswordField(
@@ -55,13 +56,14 @@ class SignupForm(FlaskForm):
     username = StringField(
         'Username',
         validators=[InputRequired(),
+        Regexp(r'^[A-Za-z0-9]+(?:[._][A-Za-z0-9]+)*$', message='Fuck! Username must contain only letters numbers or underscore'),
         Length(min=4, max=32)]
         )
     password = PasswordField(
         'Password',
         validators=[InputRequired(), 
         Length(min=6, max=32),
-        EqualTo('confirm', message='Password doesn\'t match')]
+        EqualTo('confirm', message='Fuck! Password doesn\'t match')]
         )
     confirm = PasswordField(
         'Confirm Password'

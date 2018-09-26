@@ -28,19 +28,20 @@ def index():
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     app_name = getAppName()
     title = 'Login — ' + app_name
     sign_err = None
     sign_msg = None
     form = LoginForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            user = User.query.filter_by(username=form.username.data).first()
-            if user and check_password_hash(user.password, form.password.data):
-                sign_msg = 'You were successfully logged in'
-                login_user(user, remember=form.remember.data)
-            else:
-                sign_err = 'Get the fuck out here!'
+    if request.method == 'POST' and form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            sign_msg = 'You were successfully logged in'
+            login_user(user, remember=form.remember.data)
+        else:
+            sign_err = 'Get the fuck out here!'
     return render_template('login.html', form=form, title=title, app_name=app_name, sign_msg=sign_msg, sign_err=sign_err)
 
 
@@ -53,13 +54,15 @@ def logout():
 # Signup route
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     app_name = getAppName()
     title = 'Signup — ' + app_name
     sign_err = None
     sign_msg = None
     form = SignupForm()
 
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         username = User.query.filter_by(username=form.username.data).first()
         email = User.query.filter_by(email=form.email.data).first()
         if username:
@@ -87,8 +90,15 @@ def dashboard():
     title = 'Dashboard — ' + app_name
     return render_template('dashboard.html', title=title, app_name=app_name)
 
+# Dashboard route
+@app.route('/dashboard2')
+def dashboard2():
+    app_name = getAppName()
+    title = 'Dashboard2 — ' + app_name
+    return render_template('dashboard2.html', title=title, app_name=app_name)
+
 # TODO
-# [ ] register unique username or email
+# [x] register unique username or email
 # [x] flask session
 # [ ] flask security 
 # Ref: https://www.youtube.com/watch?v=8aTnmsDMldY&t=1397s
